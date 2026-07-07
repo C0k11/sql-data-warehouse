@@ -90,8 +90,8 @@ default; set `DWH_SA_PASSWORD` for SQL auth (see
 
 Pure-SQL alternative (no Python): run the scripts in `scripts/` in order with
 `sqlcmd -v DATA_DIR=... DATA_ROOT=...` (both variables are required), pointing
-`DATA_ROOT` at line-ending-normalized copies of the CSVs — the raw extracts have
-mixed CRLF/LF endings and missing final newlines that BULK INSERT mishandles
+`DATA_ROOT` at line-ending-normalized copies of the CSVs — the raw extracts use
+CRLF endings and three lack a final newline, both of which BULK INSERT mishandles
 (that normalization is exactly what the orchestrator's landing zone does for you).
 
 ## Repository layout
@@ -120,8 +120,10 @@ docs/               data catalog
   development, every time with all business-domain checks still green:
   - three source files lack a final newline; `cust_info.csv` and `CUST_AZ12.csv`
     silently lost their last row to BULK INSERT → caught by row-count reconciliation;
-  - CRLF files leaked `\r` into their last column, folding all 18,483 ERP gender
-    values into `n/a` → caught by landing normalization + control-character checks;
+  - CRLF endings leaked `\r` into each row's last field; numeric/date columns
+    silently tolerate it during type conversion, but NVARCHAR columns keep it —
+    folding all 18,483 ERP gender values into `n/a` → fixed by landing
+    normalization, guarded by control-character checks;
   - UTF-8 files decoded with the server's legacy code page turned 93 non-ASCII
     names into mojibake (`José` → `Jos茅`) → fixed with `CODEPAGE 65001`;
   - a 4-digit junk date (`5489`) parsed as *year 5489*, inflating `dim_date` to
