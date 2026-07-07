@@ -1,5 +1,7 @@
 # SQL Data Warehouse — Medallion Architecture on SQL Server
 
+[![pipeline-e2e](https://github.com/C0k11/sql-data-warehouse/actions/workflows/ci.yml/badge.svg)](https://github.com/C0k11/sql-data-warehouse/actions/workflows/ci.yml)
+
 An end-to-end data warehouse built with **T-SQL on SQL Server 2022**, consolidating
 CRM and ERP extracts into a star schema through a Bronze → Silver → Gold medallion
 architecture — with pipeline observability, an automated data-quality gate,
