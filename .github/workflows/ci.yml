@@ -1,0 +1,60 @@
+name: pipeline-e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    env:
+      SA_PASSWORD: "Ci_P@ssw0rd_2026!"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start SQL Server 2022 (repo bind-mounted at /repo)
+        run: |
+          docker run -d --name mssql \
+            -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD="$SA_PASSWORD" \
+            -p 1433:1433 \
+            -v "$GITHUB_WORKSPACE:/repo" \
+            mcr.microsoft.com/mssql/server:2022-latest
+          echo "Waiting for SQL Server to accept connections..."
+          for i in $(seq 1 60); do
+            if docker exec mssql /opt/mssql-tools18/bin/sqlcmd \
+                 -S localhost -U sa -P "$SA_PASSWORD" -C -Q "SELECT 1" >/dev/null 2>&1; then
+              echo "SQL Server is up."; exit 0
+            fi
+            sleep 2
+          done
+          echo "SQL Server did not come up in time"; docker logs mssql; exit 1
+
+      - name: Install msodbcsql18 + pyodbc
+        run: |
+          curl -sSL -O "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update -qq
+          sudo ACCEPT_EULA=Y apt-get install -y -qq msodbcsql18
+          pip install --quiet pyodbc
+
+      - name: Run pipeline end-to-end (init + load + quality gate)
+        env:
+          DWH_SA_PASSWORD: ${{ env.SA_PASSWORD }}
+          DWH_DB_DATADIR: /var/opt/mssql/data
+          DWH_DB_LANDING: /repo/db/landing
+        run: |
+          python pipeline/run_pipeline.py --server "tcp:localhost,1433"
+
+      - name: Verify SCD2 change capture
+        env:
+          DWH_SA_PASSWORD: ${{ env.SA_PASSWORD }}
+        run: |
+          docker exec mssql /opt/mssql-tools18/bin/sqlcmd \
+            -S localhost -U sa -P "$SA_PASSWORD" -C -d DataWarehouse -b -Q "
+              UPDATE bronze.crm_cust_info SET cst_marital_status = 'S' WHERE cst_id = 11000;
+              EXEC silver.load_silver;
+              EXEC gold.load_gold;
+              IF (SELECT COUNT(*) FROM gold.dim_customers_scd2 WHERE customer_id = 11000) != 2
+                THROW 50002, 'SCD2 did not version the changed customer', 1;
+              EXEC etl.run_quality_checks;"
