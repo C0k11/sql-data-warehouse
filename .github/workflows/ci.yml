@@ -52,8 +52,11 @@ jobs:
         run: |
           docker exec mssql /opt/mssql-tools18/bin/sqlcmd \
             -S localhost -U sa -P "$SA_PASSWORD" -C -d DataWarehouse -b -Q "
-              IF NOT EXISTS (SELECT 1 FROM silver.crm_cust_info WHERE cst_firstname = N'José')
-                THROW 50004, 'UTF-8 decoding regressed: accented names corrupted', 1;
+              SELECT actual_name_bytes = CONVERT(VARBINARY(20), cst_firstname)
+              FROM silver.crm_cust_info WHERE cst_id = 11253;
+              IF NOT EXISTS (SELECT 1 FROM silver.crm_cust_info WHERE cst_id = 11253
+                             AND CONVERT(VARBINARY(20), cst_firstname) = 0x4A006F007300E900)
+                THROW 50004, 'UTF-8 decoding regressed: expected Jose with accent (0x4A006F007300E900)', 1;
               UPDATE bronze.crm_cust_info SET cst_marital_status = 'S' WHERE cst_id = 11000;
               EXEC silver.load_silver;
               EXEC gold.load_gold;
