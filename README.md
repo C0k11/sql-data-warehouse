@@ -65,7 +65,7 @@ flowchart LR
 | History | none (latest state only) | **SCD Type 2 customer dimension**: expire-then-insert with `SHA2_256` attribute hashing, idempotent re-runs, overlap/current-row invariants enforced by checks |
 | Surrogate keys | `ROW_NUMBER()` in views (unstable across days) | persisted `IDENTITY` keys for the SCD2 dimension; tradeoff documented |
 | Date dimension | none | generated `gold.dim_date` spanning the fact date range |
-| Ingestion robustness | breaks on real-world file artifacts | landing zone normalizes CRLF/missing-final-newline (which silently dropped rows and corrupted 18k gender values); `CODEPAGE 65001` on BULK INSERT (without it, 93 non-ASCII names arrive as mojibake on any non-Latin server code page); file↔bronze row-count reconciliation |
+| Ingestion robustness | breaks on real-world file artifacts | landing zone rewrites extracts as UTF-16/LF (fixes silently dropped last rows, CR leakage that corrupted 18k gender values, AND legacy-code-page mojibake — `CODEPAGE 65001` fixes Windows but SQL Server on Linux rejects it, so `widechar` is the only cross-platform Unicode path); file↔bronze row-count reconciliation |
 | Portability | hardcoded `C:\` paths | config-table-driven paths; same scripts run locally (Windows, shared memory) and in CI (Linux container, TCP) |
 | Orchestration | run scripts by hand in SSMS | `pipeline/run_pipeline.py` — one command, ordered execution, load summary, nonzero exit on failure |
 | CI | none | GitHub Actions: full rebuild in a SQL Server 2022 container + SCD2 change-capture test on every push |
@@ -90,9 +90,10 @@ default; set `DWH_SA_PASSWORD` for SQL auth (see
 
 Pure-SQL alternative (no Python): run the scripts in `scripts/` in order with
 `sqlcmd -v DATA_DIR=... DATA_ROOT=...` (both variables are required), pointing
-`DATA_ROOT` at line-ending-normalized copies of the CSVs — the raw extracts use
-CRLF endings and three lack a final newline, both of which BULK INSERT mishandles
-(that normalization is exactly what the orchestrator's landing zone does for you).
+`DATA_ROOT` at UTF-16/LF-normalized copies of the CSVs — the raw extracts are
+UTF-8 with CRLF endings and three lack a final newline, all of which BULK INSERT
+mishandles (that normalization is exactly what the orchestrator's landing zone
+does for you).
 
 ## Repository layout
 
@@ -125,7 +126,11 @@ docs/               data catalog
     folding all 18,483 ERP gender values into `n/a` → fixed by landing
     normalization, guarded by control-character checks;
   - UTF-8 files decoded with the server's legacy code page turned 93 non-ASCII
-    names into mojibake (`José` → `Jos茅`) → fixed with `CODEPAGE 65001`;
+    names into mojibake (`José` → `Jos茅` on a Chinese-collation Windows server,
+    `Jos├⌐` in the Linux CI container) — and the fix that works on Windows
+    (`CODEPAGE 65001`) is rejected by SQL Server on Linux, so the landing zone
+    re-encodes to UTF-16 and loads with `DATAFILETYPE='widechar'`; CI asserts
+    the stored UTF-16 bytes of a known accented name on every run;
   - a 4-digit junk date (`5489`) parsed as *year 5489*, inflating `dim_date` to
     1.27M rows → fixed by the guarded `etl.try_yyyymmdd` parser.
 - Adversarially reviewed: SCD2 soft-delete semantics vs. check contradictions,

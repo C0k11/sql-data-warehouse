@@ -65,30 +65,34 @@ SQLCMD_VARS = {
 
 
 def normalize_to_landing() -> None:
-    """Copy raw extracts into the landing zone with normalized line endings.
+    """Copy raw extracts into the landing zone, normalized for BULK INSERT.
 
-    Source files arrive with mixed CRLF/LF endings and sometimes no final
-    newline; BULK INSERT then drops the last row and leaks CR into the last
-    column. Raw files are never mutated — normalization happens on the copy.
+    Raw files are UTF-8 with CRLF endings and sometimes no final newline;
+    BULK INSERT drops the unterminated last row, leaks CR into the last
+    column, and decodes UTF-8 with a legacy code page (CODEPAGE 65001 fixes
+    Windows but is rejected by SQL Server on Linux). Landing copies are
+    therefore rewritten as UTF-16 with LF endings — DATAFILETYPE='widechar'
+    reads UTF-16 identically on both platforms. Raw files are never mutated.
     """
     for rel in FILE_TABLE_MAP:
         src = ROOT / "datasets" / rel
         dst = LANDING / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
-        data = src.read_bytes().replace(b"\r\n", b"\n")
-        if not data.endswith(b"\n"):
-            data += b"\n"
-        dst.write_bytes(data)
-    print(f"--> landing zone refreshed: {len(FILE_TABLE_MAP)} files -> {LANDING}")
+        text = src.read_bytes().decode("utf-8-sig").replace("\r\n", "\n")
+        if not text.endswith("\n"):
+            text += "\n"
+        dst.write_bytes(text.encode("utf-16"))  # BOM + UTF-16LE
+    print(f"--> landing zone refreshed: {len(FILE_TABLE_MAP)} files (UTF-16) -> {LANDING}")
 
 
 def reconcile_bronze(conn: pyodbc.Connection) -> None:
-    """Fail if bronze row counts do not match the landed source files."""
+    """Fail if bronze row counts do not match the RAW source files."""
     cursor = conn.cursor()
     print("--> reconciling source files vs bronze")
     mismatches = []
     for rel, table in FILE_TABLE_MAP.items():
-        expected = (LANDING / rel).read_bytes().count(b"\n") - 1  # minus header
+        raw_text = (ROOT / "datasets" / rel).read_bytes().decode("utf-8-sig")
+        expected = len(raw_text.splitlines()) - 1  # minus header
         cursor.execute(f"SELECT COUNT(*) FROM DataWarehouse.{table};")
         actual = cursor.fetchone()[0]
         status = "OK " if expected == actual else "MISMATCH"

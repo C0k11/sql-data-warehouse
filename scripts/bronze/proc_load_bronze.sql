@@ -31,22 +31,19 @@ BEGIN
     DECLARE @t0   DATETIME2(3) = SYSDATETIME();
     DECLARE @rows INT;
 
-    -- Source files are UTF-8. Windows builds decode with the legacy ACP unless
-    -- CODEPAGE 65001 is forced (silently mangling non-ASCII names); Linux
-    -- builds read UTF-8 natively and REJECT the CODEPAGE option (error 16202).
-    DECLARE @codepage NVARCHAR(30) =
-        CASE (SELECT host_platform FROM sys.dm_os_host_info)
-             WHEN 'Windows' THEN N' CODEPAGE = ''65001'','
-             ELSE N''
-        END;
-
+    -- Landing files are UTF-16 (see the orchestrator): widechar is the only
+    -- Unicode input mode BULK INSERT supports on BOTH platforms — Windows
+    -- decodes UTF-8 with the legacy ACP unless CODEPAGE 65001 is forced, and
+    -- Linux rejects the CODEPAGE option outright (error 16202) while
+    -- defaulting to CP437. ROWTERMINATOR is the WIDE line feed (0x0A00);
+    -- FORMAT='CSV' is omitted (no quoted fields in these extracts).
     BEGIN TRY
         SET @sql = CONCAT(
             N'TRUNCATE TABLE ', @table_name, N';',
             N'BULK INSERT ', @table_name,
             N' FROM ''', REPLACE(@file, '''', ''''''), N'''',
-            N' WITH (FORMAT = ''CSV'',', @codepage, N' FIRSTROW = 2,',
-            N' FIELDTERMINATOR = '','', ROWTERMINATOR = ''0x0a'', KEEPNULLS, TABLOCK);'
+            N' WITH (DATAFILETYPE = ''widechar'', FIRSTROW = 2,',
+            N' FIELDTERMINATOR = '','', ROWTERMINATOR = ''0x0A00'', KEEPNULLS, TABLOCK);'
         );
         EXEC sp_executesql @sql;
 
