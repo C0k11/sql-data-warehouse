@@ -1,7 +1,7 @@
-# Source extracts must stay byte-exact: their mixed line endings and missing
-# final newlines are the real-world artifacts the ingestion layer is built to
-# handle (and what the tests prove it handles). No CRLF conversion.
-datasets/** -text
-
-# Everything else: normalize to LF in the repo
+# Default: normalize to LF in the repo
 * text=auto eol=lf
+
+# Source extracts must stay byte-exact (this later rule wins for datasets/):
+# their mixed line endings and missing final newlines are the real-world
+# artifacts the ingestion layer is built to handle, and the tests prove it.
+datasets/** -text
