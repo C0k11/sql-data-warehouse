@@ -31,15 +31,22 @@ BEGIN
     DECLARE @t0   DATETIME2(3) = SYSDATETIME();
     DECLARE @rows INT;
 
+    -- Source files are UTF-8. Windows builds decode with the legacy ACP unless
+    -- CODEPAGE 65001 is forced (silently mangling non-ASCII names); Linux
+    -- builds read UTF-8 natively and REJECT the CODEPAGE option (error 16202).
+    DECLARE @codepage NVARCHAR(30) =
+        CASE (SELECT host_platform FROM sys.dm_os_host_info)
+             WHEN 'Windows' THEN N' CODEPAGE = ''65001'','
+             ELSE N''
+        END;
+
     BEGIN TRY
         SET @sql = CONCAT(
             N'TRUNCATE TABLE ', @table_name, N';',
             N'BULK INSERT ', @table_name,
             N' FROM ''', REPLACE(@file, '''', ''''''), N'''',
-            N' WITH (FORMAT = ''CSV'', CODEPAGE = ''65001'', FIRSTROW = 2,',
+            N' WITH (FORMAT = ''CSV'',', @codepage, N' FIRSTROW = 2,',
             N' FIELDTERMINATOR = '','', ROWTERMINATOR = ''0x0a'', KEEPNULLS, TABLOCK);'
-            -- CODEPAGE 65001: source files are UTF-8; without it the server
-            -- decodes with its legacy ACP and silently mangles non-ASCII names
         );
         EXEC sp_executesql @sql;
 
