@@ -1,0 +1,596 @@
+{
+  "engine": "sqlserver",
+  "tables": {
+    "gold.dim_customers": {
+      "columns": {
+        "birthdate": {
+          "_type": "date",
+          "distinct": 6136,
+          "max": "1986-06-25",
+          "min": "1916-02-10",
+          "nonnull": 18468
+        },
+        "country": {
+          "_type": "nvarchar",
+          "chars": 190124,
+          "distinct": 7,
+          "nonnull": 18484
+        },
+        "create_date": {
+          "_type": "date",
+          "distinct": 114,
+          "max": "2026-01-27",
+          "min": "2025-10-06",
+          "nonnull": 18484
+        },
+        "customer_id": {
+          "_type": "int",
+          "distinct": 18484,
+          "max": 29483,
+          "min": 11000,
+          "nonnull": 18484,
+          "sum": 374143886
+        },
+        "customer_number": {
+          "_type": "nvarchar",
+          "chars": 184840,
+          "distinct": 18484,
+          "nonnull": 18484
+        },
+        "first_name": {
+          "_type": "nvarchar",
+          "chars": 109966,
+          "distinct": 670,
+          "nonnull": 18484
+        },
+        "gender": {
+          "_type": "nvarchar",
+          "chars": 92177,
+          "distinct": 3,
+          "nonnull": 18484
+        },
+        "last_name": {
+          "_type": "nvarchar",
+          "chars": 102532,
+          "distinct": 375,
+          "nonnull": 18484
+        },
+        "marital_status": {
+          "_type": "nvarchar",
+          "chars": 120915,
+          "distinct": 2,
+          "nonnull": 18484
+        }
+      },
+      "row_count": 18484
+    },
+    "gold.dim_customers_scd2": {
+      "columns": {
+        "birthdate": {
+          "_type": "date",
+          "distinct": 6136,
+          "max": "1986-06-25",
+          "min": "1916-02-10",
+          "nonnull": 18468
+        },
+        "country": {
+          "_type": "nvarchar",
+          "chars": 190124,
+          "distinct": 7,
+          "nonnull": 18484
+        },
+        "create_date": {
+          "_type": "date",
+          "distinct": 114,
+          "max": "2026-01-27",
+          "min": "2025-10-06",
+          "nonnull": 18484
+        },
+        "customer_id": {
+          "_type": "int",
+          "distinct": 18484,
+          "max": 29483,
+          "min": 11000,
+          "nonnull": 18484,
+          "sum": 374143886
+        },
+        "customer_number": {
+          "_type": "nvarchar",
+          "chars": 184840,
+          "distinct": 18484,
+          "nonnull": 18484
+        },
+        "first_name": {
+          "_type": "nvarchar",
+          "chars": 109966,
+          "distinct": 670,
+          "nonnull": 18484
+        },
+        "gender": {
+          "_type": "nvarchar",
+          "chars": 92177,
+          "distinct": 3,
+          "nonnull": 18484
+        },
+        "is_current": {
+          "_type": "bit",
+          "nonnull": 18484,
+          "true_count": 18484
+        },
+        "last_name": {
+          "_type": "nvarchar",
+          "chars": 102532,
+          "distinct": 375,
+          "nonnull": 18484
+        },
+        "marital_status": {
+          "_type": "nvarchar",
+          "chars": 120915,
+          "distinct": 2,
+          "nonnull": 18484
+        }
+      },
+      "row_count": 18484
+    },
+    "gold.dim_date": {
+      "columns": {
+        "date_key": {
+          "_type": "int",
+          "distinct": 1139,
+          "max": 20140209,
+          "min": 20101229,
+          "nonnull": 1139,
+          "sum": 22918161174
+        },
+        "day": {
+          "_type": "tinyint",
+          "distinct": 31,
+          "max": 31,
+          "min": 1,
+          "nonnull": 1139,
+          "sum": 17874
+        },
+        "full_date": {
+          "_type": "date",
+          "distinct": 1139,
+          "max": "2014-02-09",
+          "min": "2010-12-29",
+          "nonnull": 1139
+        },
+        "is_weekend": {
+          "_type": "bit",
+          "nonnull": 1139,
+          "true_count": 326
+        },
+        "month": {
+          "_type": "tinyint",
+          "distinct": 12,
+          "max": 12,
+          "min": 1,
+          "nonnull": 1139,
+          "sum": 7233
+        },
+        "month_name": {
+          "_type": "nvarchar",
+          "chars": 7053,
+          "distinct": 12,
+          "nonnull": 1139
+        },
+        "quarter": {
+          "_type": "tinyint",
+          "distinct": 4,
+          "max": 4,
+          "min": 1,
+          "nonnull": 1139,
+          "sum": 2801
+        },
+        "weekday_name": {
+          "_type": "nvarchar",
+          "chars": 8137,
+          "distinct": 7,
+          "nonnull": 1139
+        },
+        "year": {
+          "_type": "smallint",
+          "distinct": 5,
+          "max": 2014,
+          "min": 2010,
+          "nonnull": 1139,
+          "sum": 2291742
+        }
+      },
+      "row_count": 1139
+    },
+    "gold.dim_products": {
+      "columns": {
+        "category": {
+          "_type": "nvarchar",
+          "chars": 2354,
+          "distinct": 4,
+          "nonnull": 288
+        },
+        "category_id": {
+          "_type": "nvarchar",
+          "chars": 1475,
+          "distinct": 37,
+          "nonnull": 295
+        },
+        "cost": {
+          "_type": "int",
+          "distinct": 90,
+          "max": 2171,
+          "min": 0,
+          "nonnull": 295,
+          "sum": 127165
+        },
+        "maintenance": {
+          "_type": "nvarchar",
+          "chars": 802,
+          "distinct": 2,
+          "nonnull": 288
+        },
+        "product_id": {
+          "_type": "int",
+          "distinct": 295,
+          "max": 606,
+          "min": 210,
+          "nonnull": 295,
+          "sum": 129896
+        },
+        "product_line": {
+          "_type": "nvarchar",
+          "chars": 1928,
+          "distinct": 5,
+          "nonnull": 295
+        },
+        "product_name": {
+          "_type": "nvarchar",
+          "chars": 6327,
+          "distinct": 295,
+          "nonnull": 295
+        },
+        "product_number": {
+          "_type": "nvarchar",
+          "chars": 2668,
+          "distinct": 295,
+          "nonnull": 295
+        },
+        "start_date": {
+          "_type": "date",
+          "distinct": 4,
+          "max": "2013-07-01",
+          "min": "2003-07-01",
+          "nonnull": 295
+        },
+        "subcategory": {
+          "_type": "nvarchar",
+          "chars": 3127,
+          "distinct": 36,
+          "nonnull": 288
+        }
+      },
+      "row_count": 295
+    },
+    "gold.fact_sales": {
+      "columns": {
+        "customer_id": {
+          "_type": "int",
+          "distinct": 18484,
+          "max": 29483,
+          "min": 11000,
+          "nonnull": 60398,
+          "sum": 1138000116
+        },
+        "due_date": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-02-09",
+          "min": "2011-01-10",
+          "nonnull": 60398
+        },
+        "order_date": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-01-28",
+          "min": "2010-12-29",
+          "nonnull": 60379
+        },
+        "order_date_key": {
+          "_type": "int",
+          "distinct": 1124,
+          "max": 20140128,
+          "min": 20101229,
+          "nonnull": 60379,
+          "sum": 1215413244501
+        },
+        "order_number": {
+          "_type": "nvarchar",
+          "chars": 422786,
+          "distinct": 27659,
+          "nonnull": 60398
+        },
+        "price": {
+          "_type": "int",
+          "distinct": 41,
+          "max": 3578,
+          "min": 2,
+          "nonnull": 60398,
+          "sum": 29355710
+        },
+        "quantity": {
+          "_type": "int",
+          "distinct": 6,
+          "max": 10,
+          "min": 1,
+          "nonnull": 60398,
+          "sum": 60423
+        },
+        "sales_amount": {
+          "_type": "int",
+          "distinct": 45,
+          "max": 3578,
+          "min": 2,
+          "nonnull": 60398,
+          "sum": 29356250
+        },
+        "shipping_date": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-02-04",
+          "min": "2011-01-05",
+          "nonnull": 60398
+        }
+      },
+      "row_count": 60398
+    },
+    "silver.crm_cust_info": {
+      "columns": {
+        "cst_create_date": {
+          "_type": "date",
+          "distinct": 114,
+          "max": "2026-01-27",
+          "min": "2025-10-06",
+          "nonnull": 18484
+        },
+        "cst_firstname": {
+          "_type": "nvarchar",
+          "chars": 109966,
+          "distinct": 670,
+          "nonnull": 18484
+        },
+        "cst_gndr": {
+          "_type": "nvarchar",
+          "chars": 83063,
+          "distinct": 3,
+          "nonnull": 18484
+        },
+        "cst_id": {
+          "_type": "int",
+          "distinct": 18484,
+          "max": 29483,
+          "min": 11000,
+          "nonnull": 18484,
+          "sum": 374143886
+        },
+        "cst_key": {
+          "_type": "nvarchar",
+          "chars": 184840,
+          "distinct": 18484,
+          "nonnull": 18484
+        },
+        "cst_lastname": {
+          "_type": "nvarchar",
+          "chars": 102532,
+          "distinct": 375,
+          "nonnull": 18484
+        },
+        "cst_marital_status": {
+          "_type": "nvarchar",
+          "chars": 120915,
+          "distinct": 2,
+          "nonnull": 18484
+        }
+      },
+      "row_count": 18484
+    },
+    "silver.crm_prd_info": {
+      "columns": {
+        "cat_id": {
+          "_type": "nvarchar",
+          "chars": 1985,
+          "distinct": 37,
+          "nonnull": 397
+        },
+        "prd_cost": {
+          "_type": "int",
+          "distinct": 109,
+          "max": 2171,
+          "min": 0,
+          "nonnull": 397,
+          "sum": 171543
+        },
+        "prd_end_dt": {
+          "_type": "date",
+          "distinct": 2,
+          "max": "2013-06-30",
+          "min": "2012-06-30",
+          "nonnull": 102
+        },
+        "prd_id": {
+          "_type": "int",
+          "distinct": 397,
+          "max": 606,
+          "min": 210,
+          "nonnull": 397,
+          "sum": 161976
+        },
+        "prd_key": {
+          "_type": "nvarchar",
+          "chars": 3643,
+          "distinct": 295,
+          "nonnull": 397
+        },
+        "prd_line": {
+          "_type": "nvarchar",
+          "chars": 2553,
+          "distinct": 5,
+          "nonnull": 397
+        },
+        "prd_nm": {
+          "_type": "nvarchar",
+          "chars": 8670,
+          "distinct": 295,
+          "nonnull": 397
+        },
+        "prd_start_dt": {
+          "_type": "date",
+          "distinct": 4,
+          "max": "2013-07-01",
+          "min": "2003-07-01",
+          "nonnull": 397
+        }
+      },
+      "row_count": 397
+    },
+    "silver.crm_sales_details": {
+      "columns": {
+        "sls_cust_id": {
+          "_type": "int",
+          "distinct": 18484,
+          "max": 29483,
+          "min": 11000,
+          "nonnull": 60398,
+          "sum": 1138000116
+        },
+        "sls_due_dt": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-02-09",
+          "min": "2011-01-10",
+          "nonnull": 60398
+        },
+        "sls_ord_num": {
+          "_type": "nvarchar",
+          "chars": 422786,
+          "distinct": 27659,
+          "nonnull": 60398
+        },
+        "sls_order_dt": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-01-28",
+          "min": "2010-12-29",
+          "nonnull": 60379
+        },
+        "sls_prd_key": {
+          "_type": "nvarchar",
+          "chars": 493132,
+          "distinct": 130,
+          "nonnull": 60398
+        },
+        "sls_price": {
+          "_type": "int",
+          "distinct": 41,
+          "max": 3578,
+          "min": 2,
+          "nonnull": 60398,
+          "sum": 29355710
+        },
+        "sls_quantity": {
+          "_type": "int",
+          "distinct": 6,
+          "max": 10,
+          "min": 1,
+          "nonnull": 60398,
+          "sum": 60423
+        },
+        "sls_sales": {
+          "_type": "int",
+          "distinct": 45,
+          "max": 3578,
+          "min": 2,
+          "nonnull": 60398,
+          "sum": 29356250
+        },
+        "sls_ship_dt": {
+          "_type": "date",
+          "distinct": 1124,
+          "max": "2014-02-04",
+          "min": "2011-01-05",
+          "nonnull": 60398
+        }
+      },
+      "row_count": 60398
+    },
+    "silver.erp_cust_az12": {
+      "columns": {
+        "bdate": {
+          "_type": "date",
+          "distinct": 6136,
+          "max": "1986-06-25",
+          "min": "1916-02-10",
+          "nonnull": 18468
+        },
+        "cid": {
+          "_type": "nvarchar",
+          "chars": 184840,
+          "distinct": 18484,
+          "nonnull": 18484
+        },
+        "gen": {
+          "_type": "nvarchar",
+          "chars": 89252,
+          "distinct": 3,
+          "nonnull": 18484
+        }
+      },
+      "row_count": 18484
+    },
+    "silver.erp_loc_a101": {
+      "columns": {
+        "cid": {
+          "_type": "nvarchar",
+          "chars": 184840,
+          "distinct": 18484,
+          "nonnull": 18484
+        },
+        "cntry": {
+          "_type": "nvarchar",
+          "chars": 190124,
+          "distinct": 7,
+          "nonnull": 18484
+        }
+      },
+      "row_count": 18484
+    },
+    "silver.erp_px_cat_g1v2": {
+      "columns": {
+        "cat": {
+          "_type": "nvarchar",
+          "chars": 351,
+          "distinct": 4,
+          "nonnull": 37
+        },
+        "id": {
+          "_type": "nvarchar",
+          "chars": 185,
+          "distinct": 37,
+          "nonnull": 37
+        },
+        "maintenance": {
+          "_type": "nvarchar",
+          "chars": 94,
+          "distinct": 2,
+          "nonnull": 37
+        },
+        "subcat": {
+          "_type": "nvarchar",
+          "chars": 329,
+          "distinct": 37,
+          "nonnull": 37
+        }
+      },
+      "row_count": 37
+    }
+  }
+}

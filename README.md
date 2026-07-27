@@ -1,12 +1,30 @@
-# SQL Data Warehouse — Medallion Architecture on SQL Server
+# Medallion Data Warehouse — one spec, two engines
 
 [![pipeline-e2e](https://github.com/C0k11/sql-data-warehouse/actions/workflows/ci.yml/badge.svg)](https://github.com/C0k11/sql-data-warehouse/actions/workflows/ci.yml)
 
-An end-to-end data warehouse built with **T-SQL on SQL Server 2022**, consolidating
-CRM and ERP extracts into a star schema through a Bronze → Silver → Gold medallion
-architecture — with pipeline observability, an automated data-quality gate,
-a Type-2 slowly changing customer dimension, and CI that rebuilds the entire
-warehouse in a container on every push.
+An end-to-end data warehouse that consolidates CRM and ERP extracts into a star
+schema through a Bronze → Silver → Gold medallion architecture — with pipeline
+observability, an automated data-quality gate, a Type-2 slowly changing customer
+dimension, and CI that rebuilds everything from scratch on every push.
+
+It is implemented **twice**: in **T-SQL on SQL Server 2022** (`scripts/`) and in
+**PySpark + Delta Lake** (`lakehouse/`), the second of which runs unchanged on a
+laptop, in CI, and on Databricks serverless.
+
+The point of building it twice is that the two can be **diffed**.
+`tools/parity.py` fingerprints every silver and gold table on either engine and
+compares them, so "the migration did not change the data" is a test result:
+
+```
+IDENTICAL: 296 metrics across 11 tables match exactly.
+```
+
+Both builds gate on the same 40 declarative quality checks and both report the
+same **39 pass / 1 warn** on this dataset. See [lakehouse/README.md](lakehouse/README.md)
+for what the engine change removed (the entire UTF-16 landing zone), what it
+cost (Delta has no unique indexes, so one invariant drops from
+engine-enforced to check-enforced), and the three Databricks-only features that
+looked fine until the pipeline actually ran.
 
 Based on the project spec by [Baraa Khatib Salkini](https://github.com/DataWithBaraa/sql-data-warehouse-project),
 re-implemented from scratch and extended (see [What's different](#whats-different-from-the-base-project)).
@@ -106,9 +124,16 @@ scripts/
   bronze/           DDL + config-driven BULK INSERT loader
   silver/           DDL + cleansing loader (rules documented per column)
   gold/             DDL (star schema views + SCD2 + dim_date) + loader
+lakehouse/          the same warehouse on PySpark + Delta Lake (see its README)
+  session.py        Spark session for laptop / CI / Databricks, one code path
+  bronze|silver|gold.py
+  quality_checks.py the same 40 checks, as Python data instead of a seed table
+  notebooks/        Databricks notebook: Volume staging + as-of join demo
 tests/              40 quality-check definitions + the gate procedure
+                    lakehouse_checks.py (encoding + SCD2 behaviour on Delta)
+                    parity_baseline_sqlserver.json (296-metric fingerprint)
 pipeline/           Python orchestrator (landing zone, reconciliation, summary)
-tools/              source data profiler that motivated the cleansing rules
+tools/              source data profiler + parity.py (cross-engine diff)
 docs/               data catalog
 ```
 
@@ -119,6 +144,11 @@ docs/               data catalog
 - Quality gates: 40 checks, 39 pass, 1 documented warning (7 products belong to
   category `CO_PE`, absent from the ERP category extract — a genuine source gap,
   kept visible as a warning instead of being silently dropped).
+- The Delta build produces **byte-for-byte equivalent output**: 296 comparable
+  metrics across 11 tables match exactly, and it reports the same 39 pass /
+  1 warn on the same check. It rebuilds in 47.4 s — about 8× slower than the
+  T-SQL build, which is the honest answer at this scale: 116k rows is well below
+  where distributed execution repays its own startup cost.
 - The robustness layers exist because each one caught a real corruption during
   development, every time with all business-domain checks still green:
   - three source files lack a final newline; `cust_info.csv` and `CUST_AZ12.csv`

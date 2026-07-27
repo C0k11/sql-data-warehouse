@@ -63,3 +63,35 @@ jobs:
               IF (SELECT COUNT(*) FROM gold.dim_customers_scd2 WHERE customer_id = 11000) != 2
                 THROW 50002, 'SCD2 did not version the changed customer', 1;
               EXEC etl.run_quality_checks;"
+
+  # The same warehouse spec on PySpark + Delta Lake. No Databricks credentials
+  # are involved: Delta Lake is open source, so the identical package that runs
+  # on Databricks serverless runs here against local storage.
+  lakehouse-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PySpark + Delta Lake
+        run: pip install --quiet "pyspark==4.0.1" "delta-spark==4.0.1"
+
+      - name: Build the lakehouse end-to-end (bronze -> silver -> gold + gates)
+        run: python -m lakehouse.run_pipeline --steps all
+
+      - name: Cross-engine parity against the T-SQL baseline
+        run: |
+          python tools/parity.py --engine spark --out build/parity_spark.json
+          python tools/parity.py --compare \
+            tests/parity_baseline_sqlserver.json build/parity_spark.json
+
+      - name: Verify non-ASCII round-trip, SCD2 versioning, and idempotence
+        run: python -m tests.lakehouse_checks
