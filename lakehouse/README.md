@@ -157,6 +157,25 @@ Full rebuild under WSL2 (Ubuntu 24.04, JDK 21, `local[*]`, 32 threads visible):
 | Cross-engine parity | **296 metrics across 11 tables — IDENTICAL** |
 | Behavioural tests | non-ASCII round-trip, SCD2 versioning, SCD2 idempotence — all pass |
 
+Then verified on **Databricks Free Edition** (serverless, Unity Catalog,
+`workspace` catalog) by running `notebooks/databricks_pipeline.py` against the
+same repo as a Git folder: same row counts, same 8 pass / 1 warn on the gold
+gate, and the SCD2 dimension versioned customer 11000 into two rows whose
+validity windows meet exactly —
+
+| customer_sk | marital_status | valid_from | valid_to | is_current |
+|---|---|---|---|---|
+| 1 | Married | 1900-01-01 | 2026-07-27 02:00:11.043 | false |
+| 18485 | Single | 2026-07-27 02:00:11.043 | 9999-12-31 | true |
+
+The audit trail recorded `rows_loaded = 1` for that run, not 18,484 — the
+distinction between "versions written by this run" and "rows now in the table"
+is the whole reason the audit table is useful across runs.
+
+Nothing in the package changed between the laptop, CI and Databricks. The only
+platform-specific code is the notebook cell that stages the CSVs into a Unity
+Catalog Volume, because Spark on serverless cannot read Workspace files.
+
 The single warning is `dim_products_category_coverage`: 7 products in category
 `CO_PE` have no matching ERP category row. **The T-SQL build reports the same
 warning on the same check** — the gate is not tuned per engine, so a real

@@ -8,8 +8,9 @@ observability, an automated data-quality gate, a Type-2 slowly changing customer
 dimension, and CI that rebuilds everything from scratch on every push.
 
 It is implemented **twice**: in **T-SQL on SQL Server 2022** (`scripts/`) and in
-**PySpark + Delta Lake** (`lakehouse/`), the second of which runs unchanged on a
-laptop, in CI, and on Databricks serverless.
+**PySpark + Delta Lake** (`lakehouse/`), the second of which has been run
+unchanged on a laptop, in CI, and on Databricks Free Edition (serverless, Unity
+Catalog) — same code, same row counts, same gate results in all three.
 
 The point of building it twice is that the two can be **diffed**.
 `tools/parity.py` fingerprints every silver and gold table on either engine and
