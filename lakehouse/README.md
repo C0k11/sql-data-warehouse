@@ -3,7 +3,7 @@
 This directory rebuilds the medallion warehouse from `scripts/` on a second
 engine. It is not a rewrite for its own sake: the spec, the cleansing rules,
 the 40 quality checks and the Type-2 customer dimension are all the same, which
-is what makes the pair useful — the differences that remain are attributable to
+is what makes the pair useful - the differences that remain are attributable to
 the *engine*, not to someone changing their mind.
 
 The same package runs in three places with no code changes:
@@ -32,7 +32,7 @@ Hadoop `winutils.exe` shim; WSL or a Linux container avoids that entirely.
 ## What the engine change removed
 
 Two of the most expensive defects in the SQL Server build simply stop existing
-here, which is worth being precise about — they were *platform* problems, not
+here, which is worth being precise about - they were *platform* problems, not
 design problems:
 
 - **The landing zone is gone.** `BULK INSERT` decodes UTF-8 with the host code
@@ -46,13 +46,13 @@ design problems:
 
 What did **not** get dropped is the row-count reconciliation the landing zone
 was protecting. "The loader silently dropped rows" is a failure mode of readers
-in general — it caught a real defect in this dataset (three extracts ship
+in general - it caught a real defect in this dataset (three extracts ship
 without a trailing newline) and it stays.
 
 ## What the engine change cost
 
 **Delta has no unique indexes.** SQL Server enforces "at most one current row
-per customer" with a filtered unique index — a constraint the engine will not
+per customer" with a filtered unique index - a constraint the engine will not
 let you violate. Here the same invariant is only verified *after* the load by
 `scd2_at_most_one_current`. That is a genuine reduction in strength: a loader
 bug would produce a double-counted customer that lives until the gate runs,
@@ -61,7 +61,7 @@ rather than being rejected at write time.
 **Audit rows are batched, not per-statement.** Each Delta append is a separate
 transaction commit, so the row-at-a-time audit logging that is free on SQL
 Server would add seconds to a pipeline whose real work takes seconds. Details
-are buffered in the driver and flushed once per run — same content, one commit
+are buffered in the driver and flushed once per run - same content, one commit
 instead of six. Failures still flush before re-raising.
 
 **`etl.config` was not carried over.** The T-SQL build reads the data root from
@@ -95,7 +95,7 @@ error. Each is commented at the site in the code.
 | `INT / INT` | truncates | promotes to `DOUBLE` | Derived price carries a fraction, so `sales = qty × price` fails on rounding alone. Fixed with `CAST(... AS INT)`. |
 | `x != TRIM(x)` | always false (ANSI padding) | works | The T-SQL check needs `DATALENGTH`; here the direct comparison is correct. |
 | `TRY_CONVERT(DATE, '5489', 112)` | year 5489 | a bare date parse over-accepts too | Same trap, same guard: length must be 8 and the year must be plausible. |
-| unparseable date | `TRY_CONVERT` returns NULL | `to_date` **raises** — ANSI mode is on by default in Spark 4.0 | Every malformed `sls_order_dt` aborts the load instead of becoming NULL. Fixed with `try_to_timestamp`. |
+| unparseable date | `TRY_CONVERT` returns NULL | `to_date` **raises** - ANSI mode is on by default in Spark 4.0 | Every malformed `sls_order_dt` aborts the load instead of becoming NULL. Fixed with `try_to_timestamp`. |
 
 One difference that is **not** on this list, because checking it showed the
 opposite of what I first assumed: Spark's lateral column alias resolution does
@@ -107,8 +107,8 @@ readability, not to prevent a bug.
 
 ## SCD2: hand-rolled vs MERGE
 
-The T-SQL build deliberately avoids `MERGE` — SQL Server's implementation has a
-long history of concurrency and duplicate-action bugs — and hand-rolls
+The T-SQL build deliberately avoids `MERGE` - SQL Server's implementation has a
+long history of concurrency and duplicate-action bugs - and hand-rolls
 expire-then-insert as two set-based statements.
 
 Here `MERGE INTO` is the right call: it is a core Delta primitive, and
@@ -137,8 +137,8 @@ python tools/parity.py --compare tests/parity_baseline_sqlserver.json build/pari
 Only portable aggregates are compared. Row hashes are excluded (different
 digest bytes per engine), `LEN` is avoided because SQL Server ignores trailing
 spaces while `length` does not, and string `min`/`max` are skipped because the
-SQL Server instance is case-insensitive and Spark is not. Technical columns —
-engine-assigned surrogate keys, load timestamps, `attr_hash` — are excluded by
+SQL Server instance is case-insensitive and Spark is not. Technical columns -
+engine-assigned surrogate keys, load timestamps, `attr_hash` - are excluded by
 design.
 
 The T-SQL baseline is checked in, so CI can verify parity without standing up
@@ -154,21 +154,21 @@ Full rebuild under WSL2 (Ubuntu 24.04, JDK 21, `local[*]`, 32 threads visible):
 | File-to-bronze reconciliation | **6/6** tables match |
 | Quality gate | **39 pass, 1 warn, 0 fail** |
 | Full rebuild | **47.4s / 47.5s** on consecutive runs |
-| Cross-engine parity | **296 metrics across 11 tables — IDENTICAL** |
-| Behavioural tests | non-ASCII round-trip, SCD2 versioning, SCD2 idempotence — all pass |
+| Cross-engine parity | **296 metrics across 11 tables - IDENTICAL** |
+| Behavioural tests | non-ASCII round-trip, SCD2 versioning, SCD2 idempotence - all pass |
 
 Then verified on **Databricks Free Edition** (serverless, Unity Catalog,
 `workspace` catalog) by running `notebooks/databricks_pipeline.py` against the
 same repo as a Git folder: same row counts, same 8 pass / 1 warn on the gold
 gate, and the SCD2 dimension versioned customer 11000 into two rows whose
-validity windows meet exactly —
+validity windows meet exactly -
 
 | customer_sk | marital_status | valid_from | valid_to | is_current |
 |---|---|---|---|---|
 | 1 | Married | 1900-01-01 | 2026-07-27 02:00:11.043 | false |
 | 18485 | Single | 2026-07-27 02:00:11.043 | 9999-12-31 | true |
 
-The audit trail recorded `rows_loaded = 1` for that run, not 18,484 — the
+The audit trail recorded `rows_loaded = 1` for that run, not 18,484 - the
 distinction between "versions written by this run" and "rows now in the table"
 is the whole reason the audit table is useful across runs.
 
@@ -178,13 +178,13 @@ Catalog Volume, because Spark on serverless cannot read Workspace files.
 
 The single warning is `dim_products_category_coverage`: 7 products in category
 `CO_PE` have no matching ERP category row. **The T-SQL build reports the same
-warning on the same check** — the gate is not tuned per engine, so a real
+warning on the same check** - the gate is not tuned per engine, so a real
 divergence would show up as a different count, not as a different opinion.
 
 For contrast, the T-SQL build rebuilds the same warehouse in roughly 6 seconds.
 Spark is about 8× slower here, and that is the expected answer rather than a
 defect: 116k rows is far below the scale at which distributed execution earns
 back its own startup cost. The reason to run this on Spark is the platform it
-unlocks — Delta time travel, `MERGE`, and a path to Databricks — not throughput
+unlocks - Delta time travel, `MERGE`, and a path to Databricks - not throughput
 at this size. Claiming otherwise would be the kind of thing this repo's quality
 gate exists to prevent.
