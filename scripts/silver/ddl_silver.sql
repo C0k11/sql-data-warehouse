@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-DDL: Silver layer — cleansed, standardized, typed tables
+DDL: Silver layer - cleansed, standardized, typed tables
 ===============================================================================
 Every table carries dwh_create_date (load audit timestamp).
 Cleansing rules live in silver.load_silver; this file is structure only.

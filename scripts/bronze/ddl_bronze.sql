@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-DDL: Bronze layer — raw landing tables, 1:1 mirrors of the source CSV columns
+DDL: Bronze layer - raw landing tables, 1:1 mirrors of the source CSV columns
 ===============================================================================
 Bronze holds data exactly as extracted: no renames, no type coercion beyond
 what BULK INSERT needs, no cleansing. Rebuildable at any time from datasets/.

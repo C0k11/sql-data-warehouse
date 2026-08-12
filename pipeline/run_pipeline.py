@@ -71,7 +71,7 @@ def normalize_to_landing() -> None:
     BULK INSERT drops the unterminated last row, leaks CR into the last
     column, and decodes UTF-8 with a legacy code page (CODEPAGE 65001 fixes
     Windows but is rejected by SQL Server on Linux). Landing copies are
-    therefore rewritten as UTF-16 with LF endings — DATAFILETYPE='widechar'
+    therefore rewritten as UTF-16 with LF endings - DATAFILETYPE='widechar'
     reads UTF-16 identically on both platforms. Raw files are never mutated.
     """
     for rel in FILE_TABLE_MAP:
@@ -209,7 +209,7 @@ def main() -> int:
     parser.add_argument(
         "--steps", default="auto", choices=["auto", "all", "init", "load"],
         help="auto = 'all' when the DB is missing, else 'load' (DESTRUCTIVE "
-             "rebuilds — which erase SCD2 history — only happen when explicitly "
+             "rebuilds - which erase SCD2 history - only happen when explicitly "
              "requested or on first run); all = drop + init + ddl + load + tests; "
              "init = rebuild objects only; load = load procs + quality gates",
     )

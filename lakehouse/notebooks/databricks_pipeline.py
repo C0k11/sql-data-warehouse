@@ -1,13 +1,13 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Medallion lakehouse — Databricks run
+# MAGIC # Medallion lakehouse - Databricks run
 # MAGIC
 # MAGIC Runs the exact same `lakehouse` package that runs locally and in CI. The
 # MAGIC only Databricks-specific work happens in this notebook: staging the CSV
 # MAGIC extracts into a Unity Catalog Volume, because Spark on serverless reads
 # MAGIC Volumes natively while Workspace files are not a Spark-readable path.
 # MAGIC
-# MAGIC **Setup:** clone this repo as a Git folder (Workspace → Create → Git folder),
+# MAGIC **Setup:** clone this repo as a Git folder (Workspace -> Create -> Git folder),
 # MAGIC then open this notebook from inside it.
 
 # COMMAND ----------
@@ -99,7 +99,7 @@ WHERE cst_id = 11000
 # --skip-bronze is load-bearing: without it the default run reloads bronze from
 # the CSVs in the Volume, overwriting the UPDATE above before silver ever reads
 # it. The snapshot would come out unchanged, the hash would match, and the
-# MERGE would expire nothing — the test would silently "pass" by doing nothing.
+# MERGE would expire nothing - the test would silently "pass" by doing nothing.
 main(["--datasets", VOLUME_PATH, "--skip-bronze"])
 
 display(spark.sql(f"""

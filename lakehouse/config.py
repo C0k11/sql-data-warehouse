@@ -70,7 +70,7 @@ SILVER_TABLES = (
 # This is documentation, NOT configuration: the hash is built from an explicit
 # expression list in gold.py (each attribute needs its own NULL handling and the
 # CRM-over-ERP gender precedence, which a bare column list cannot express).
-# Editing this tuple changes nothing on its own — change the concat_ws in
+# Editing this tuple changes nothing on its own - change the concat_ws in
 # gold.SRC_SNAPSHOT and keep this list in step. Doing so re-hashes every row,
 # which expires and re-inserts the whole dimension, so treat the pair as part of
 # the table contract.

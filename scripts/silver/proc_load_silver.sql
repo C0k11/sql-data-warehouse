@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Proc: silver.load_silver — cleanse + standardize bronze into silver
+Proc: silver.load_silver - cleanse + standardize bronze into silver
 ===============================================================================
 Cleansing rules (each backed by profiling of the raw files, see tools/):
   crm_cust_info   : drop 4 blank ids, dedupe 5 duplicate ids (6 surplus rows)

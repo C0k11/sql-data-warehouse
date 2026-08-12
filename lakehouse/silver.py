@@ -6,7 +6,7 @@ literal translation would have produced *different data* are called out inline:
 NULL ordering, integer division, and the guarded yyyymmdd parse.
 
 Each table is rebuilt with CREATE OR REPLACE TABLE ... AS SELECT, which Delta
-commits atomically — the SQL Server equivalent (TRUNCATE then INSERT) leaves
+commits atomically - the SQL Server equivalent (TRUNCATE then INSERT) leaves
 the table empty for the duration of the load.
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ def _try_yyyymmdd(col: str) -> str:
     """Guarded integer-yyyymmdd -> DATE.
 
     The guard is not optional. Handed the 4-digit value 5489, a bare date parse
-    reads it as the *year* 5489 and succeeds — in the SQL Server build that one
+    reads it as the *year* 5489 and succeeds - in the SQL Server build that one
     row inflated the generated date dimension to 1.27 million rows before the
     length check was added. Same trap here, same guard.
     """
@@ -30,7 +30,7 @@ def _try_yyyymmdd(col: str) -> str:
     # try_to_timestamp, not try_to_date: try_to_date is a Databricks-only
     # builtin and is absent from Apache Spark's FunctionRegistry, so it would
     # resolve on Databricks and die with UNRESOLVED_ROUTINE in CI. A plain
-    # to_date is not an option either — Spark 4.0 enables ANSI mode by default,
+    # to_date is not an option either - Spark 4.0 enables ANSI mode by default,
     # so an unparseable value raises instead of yielding NULL.
     parsed = f"CAST(try_to_timestamp({s}, 'yyyyMMdd') AS DATE)"
     return (

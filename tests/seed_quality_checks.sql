@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Seed: etl.quality_check — data quality check definitions
+Seed: etl.quality_check - data quality check definitions
 ===============================================================================
 Each check_sql SELECTs VIOLATING rows; the runner counts them.
 0 rows = pass. severity 'error' fails the pipeline, 'warn' is reported only.
@@ -115,7 +115,7 @@ INSERT INTO etl.quality_check (layer, table_name, check_name, severity, check_sq
 ('gold', 'gold.fact_sales', 'fact_date_key_in_dim_date', 'error',
  N'SELECT 1 AS v FROM gold.fact_sales f WHERE f.order_date_key IS NOT NULL AND NOT EXISTS (SELECT 1 FROM gold.dim_date d WHERE d.date_key = f.order_date_key)'),
 -- AT MOST one current row: zero current rows is legitimate (customer deleted
--- from the source gets expired with no replacement — by loader design)
+-- from the source gets expired with no replacement - by loader design)
 ('gold', 'gold.dim_customers_scd2', 'scd2_at_most_one_current', 'error',
  N'SELECT customer_id FROM gold.dim_customers_scd2 GROUP BY customer_id HAVING SUM(CAST(is_current AS INT)) > 1'),
 ('gold', 'gold.dim_customers_scd2', 'scd2_deleted_customers_visible', 'warn',

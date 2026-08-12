@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Proc: gold.load_gold — populate dim_date and apply SCD2 to dim_customers_scd2
+Proc: gold.load_gold - populate dim_date and apply SCD2 to dim_customers_scd2
 ===============================================================================
 SCD2 is applied as expire-then-insert (two set-based statements) instead of
 MERGE: same effect, no MERGE concurrency/duplicate-action pitfalls, and each
@@ -38,7 +38,7 @@ BEGIN
         WHERE v IS NOT NULL;
 
         IF @d_min IS NULL
-            THROW 50003, 'gold.load_gold: silver.crm_sales_details has no parseable dates — load silver first.', 1;
+            THROW 50003, 'gold.load_gold: silver.crm_sales_details has no parseable dates - load silver first.', 1;
 
         TRUNCATE TABLE gold.dim_date;
         ;WITH seq AS (

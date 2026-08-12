@@ -58,7 +58,7 @@ def main() -> int:
     # the replacement character is the tell that the encoding option was ignored.
     mojibake = spark.sql(
         f"SELECT count(*) AS n FROM {cat}.silver.crm_cust_info "
-        f"WHERE cst_firstname LIKE '%�%' OR cst_lastname LIKE '%�%'"
+        f"WHERE cst_firstname LIKE '%{chr(0xFFFD)}%' OR cst_lastname LIKE '%{chr(0xFFFD)}%'"
     ).first()["n"]
     check("no replacement characters in names", mojibake == 0, f"found {mojibake}")
 

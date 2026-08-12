@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-Proc: bronze.load_bronze — full reload of all bronze tables from CSV files
+Proc: bronze.load_bronze - full reload of all bronze tables from CSV files
 ===============================================================================
 Differences vs. a naive loader:
     - File root comes from etl.config('data_root'), so the same proc works on
@@ -32,7 +32,7 @@ BEGIN
     DECLARE @rows INT;
 
     -- Landing files are UTF-16 (see the orchestrator): widechar is the only
-    -- Unicode input mode BULK INSERT supports on BOTH platforms — Windows
+    -- Unicode input mode BULK INSERT supports on BOTH platforms - Windows
     -- decodes UTF-8 with the legacy ACP unless CODEPAGE 65001 is forced, and
     -- Linux rejects the CODEPAGE option outright (error 16202) while
     -- defaulting to CP437. ROWTERMINATOR is the WIDE line feed (0x0A00);

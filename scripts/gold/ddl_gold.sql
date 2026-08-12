@@ -1,6 +1,6 @@
 /*
 ===============================================================================
-DDL: Gold layer — star schema for analytics
+DDL: Gold layer - star schema for analytics
 ===============================================================================
 Physical tables:
     gold.dim_date            calendar dimension (generated, not in tutorial)
@@ -12,7 +12,7 @@ Views:
     gold.fact_sales     sales facts wired to dimension surrogate keys
 
 Design note: the customer dimension is materialized (stable customer_key
-across loads — safe for BI extracts); products stay a view with ROW_NUMBER
+across loads - safe for BI extracts); products stay a view with ROW_NUMBER
 keys, acceptable because nothing persists product_key outside the warehouse.
 The tradeoff is documented in docs/data_catalog.md.
 ===============================================================================

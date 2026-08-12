@@ -1,7 +1,7 @@
 """Pipeline observability: run + per-table audit logs, persisted as Delta.
 
 Differs deliberately from the SQL Server implementation in one place. There,
-every table load INSERTs its own audit row as it finishes — cheap on an OLTP
+every table load INSERTs its own audit row as it finishes - cheap on an OLTP
 engine. On Spark each append is a separate transaction that commits a new file,
 so row-at-a-time logging would add seconds of commit overhead to a pipeline
 whose actual work takes seconds. Details are therefore buffered in the driver

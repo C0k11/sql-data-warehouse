@@ -3,8 +3,8 @@
 Two deliberate divergences from the SQL Server build, both because the engine
 changed rather than because the design did:
 
-1. SCD2 uses MERGE. The T-SQL version avoids MERGE on purpose — SQL Server's
-   implementation has a long history of concurrency and duplicate-action bugs —
+1. SCD2 uses MERGE. The T-SQL version avoids MERGE on purpose - SQL Server's
+   implementation has a long history of concurrency and duplicate-action bugs -
    and hand-rolls expire-then-insert instead. Delta's MERGE is a core, heavily
    exercised primitive, and WHEN NOT MATCHED BY SOURCE expresses "this customer
    disappeared from the source" as one clause instead of a LEFT JOIN.
@@ -93,7 +93,7 @@ def _load_dim_date(spark: SparkSession, cat: str, run: LoadRun) -> None:
         """).first()
         if span["d_min"] is None:
             raise RuntimeError(
-                "gold: silver.crm_sales_details has no parseable dates — load silver first."
+                "gold: silver.crm_sales_details has no parseable dates - load silver first."
             )
         spark.sql(f"""
 CREATE OR REPLACE TABLE {target} USING DELTA AS

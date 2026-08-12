@@ -14,7 +14,7 @@ Creates (idempotent, WARNING: drops and recreates the database):
 Usage:
     Preferred: py pipeline/run_pipeline.py  (supplies DATA_DIR/DATA_ROOT and
     normalizes source files into the landing zone first).
-    Pure sqlcmd: the two variables are REQUIRED (no :setvar defaults — sqlcmd
+    Pure sqlcmd: the two variables are REQUIRED (no :setvar defaults - sqlcmd
     gives :setvar precedence over -v, which would silently ignore your paths):
         sqlcmd -S localhost\SQLEXPRESS -E -C -i scripts/init_database.sql ^
                -v DATA_DIR="<dir for mdf/ldf>" DATA_ROOT="<dir with the CSVs>"

@@ -4,7 +4,7 @@ The SQL Server build needs a landing zone that rewrites every extract as UTF-16
 with LF endings, because BULK INSERT decodes UTF-8 with the host code page on
 Windows and rejects the CODEPAGE option outright on Linux. Spark takes the
 encoding as a read option and handles CRLF itself, so that whole stage
-disappears here — the extracts are read exactly as they sit in the repo.
+disappears here - the extracts are read exactly as they sit in the repo.
 
 What does NOT disappear is the reconciliation the landing zone was protecting:
 row counts are still verified against the raw files, because "the loader

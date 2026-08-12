@@ -1,10 +1,10 @@
 /*
 ===============================================================================
-Proc: etl.run_quality_checks — execute all enabled checks, record, gate
+Proc: etl.run_quality_checks - execute all enabled checks, record, gate
 ===============================================================================
 Runs every enabled check for @layer (or all layers when NULL), writes one row
 per check into etl.quality_result, prints a summary, and THROWs if any
-error-severity check found violations — so the orchestrator / CI fails.
+error-severity check found violations - so the orchestrator / CI fails.
 
 Usage:
     EXEC etl.run_quality_checks;                 -- all layers
